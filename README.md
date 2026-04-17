@@ -1,5 +1,7 @@
 # Aletheia AI - Autonomous Thinking Assistant
 
+[![CI](https://github.com/jayaprakash2207/Aletheia-AI---Autonomous-Thinking-Assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/jayaprakash2207/Aletheia-AI---Autonomous-Thinking-Assistant/actions/workflows/ci.yml)
+
 Aletheia AI is a production-oriented autonomous assistant that can reason, plan, perceive the screen, execute actions, validate outcomes, and self-correct with a feedback loop.
 
 ## Core Capabilities
