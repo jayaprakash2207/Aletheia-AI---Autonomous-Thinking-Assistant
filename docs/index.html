@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aletheia AI — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: #0d1117; color: #f9fafb; font-family: 'Inter', sans-serif; min-height: 100vh; }
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+@keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes spin   { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+</style>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <rect width="120" height="80" fill="#111827"/>
+  <rect x="10" y="10" width="100" height="60" rx="6" fill="#1f2937" stroke="#374151" stroke-width="1"/>
+  <circle cx="35" cy="40" r="12" fill="none" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="35" cy="40" r="4" fill="#2563eb"/>
+  <path d="M35 28v4M35 48v4M23 40h4M43 40h4" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="54" y="36" font-family="sans-serif" font-size="9" font-weight="700" fill="#f9fafb">Aletheia AI</text>
+  <text x="54" y="48" font-family="sans-serif" font-size="6" fill="#6b7280">Design System</text>
+</svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const C = {
+  bgBase:'#111827', bgSurface:'#1f2937', bgElevated:'#374151',
+  border:'#374151', borderSubtle:'rgba(255,255,255,0.06)',
+  fg1:'#f9fafb', fg2:'#e5e7eb', fg3:'#9ca3af', fg4:'#6b7280',
+  blue:'#2563eb', blueDark:'#1d4ed8', blueLight:'#3b82f6',
+  green:'#10b981', amber:'#f59e0b', red:'#ef4444',
+  purple:'#8b5cf6', teal:'#06b6d4', orange:'#f97316',
+};
+
+const Icon = ({ name, size=16, color='currentColor', style={} }) => {
+  const paths = {
+    cpu:     <><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></>,
+    eye:     <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    zap:     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>,
+    check:   <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></>,
+    refresh: <><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></>,
+    terminal:<><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></>,
+    settings:<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
+    play:    <polygon points="5 3 19 12 5 21 5 3"/>,
+    stop:    <rect x="3" y="3" width="18" height="18" rx="2"/>,
+    brain:   <><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.44-3.14A2.5 2.5 0 0 1 9.5 2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.44-3.14A2.5 2.5 0 0 0 14.5 2z"/></>,
+    loader:  <><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></>,
+    x:       <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    history: <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></>,
+    palette: <><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20c-2 0-3-1-3-3s1-3 3-3h1a2 2 0 0 0 2-2 2 2 0 0 0-2-2H6a2 2 0 0 0-2 2"/></>,
+    type:    <><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></>,
+    layout:  <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></>,
+    package: <><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>,
+    code:    <><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>,
+    github:  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>,
+    arrow:   <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>,
+  };
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={style}>
+      {paths[name]}
+    </svg>
+  );
+};
+
+const Logo = ({ size=32 }) => (
+  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+    <div style={{ width:size, height:size, borderRadius:Math.round(size*0.28), background:C.blue, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:`0 0 20px rgba(37,99,235,0.4)` }}>
+      <svg width={size*0.6} height={size*0.6} viewBox="0 0 22 22" fill="none">
+        <circle cx="11" cy="11" r="4" stroke="white" strokeWidth="1.6"/>
+        <circle cx="11" cy="11" r="1.5" fill="white"/>
+        <path d="M11 3v3M11 16v3M3 11h3M16 11h3" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+        <path d="M5.6 5.6l2.1 2.1M14.3 14.3l2.1 2.1M5.6 16.4l2.1-2.1M14.3 7.7l2.1-2.1" stroke="rgba(255,255,255,0.4)" strokeWidth="1" strokeLinecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div style={{ fontFamily:'Space Grotesk', fontSize:size*0.72, fontWeight:700, color:C.fg1, letterSpacing:'-0.02em', lineHeight:1 }}>Aletheia AI</div>
+      <div style={{ fontSize:10, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', fontFamily:'JetBrains Mono', marginTop:3 }}>Design System</div>
+    </div>
+  </div>
+);
+
+// ── Hero ─────────────────────────────────────────────────
+const Hero = () => (
+  <div style={{ background:`linear-gradient(180deg, #0d1117 0%, #111827 100%)`, borderBottom:`1px solid ${C.border}`, padding:'64px 48px 56px' }}>
+    <div style={{ maxWidth:1100, margin:'0 auto' }}>
+      <Logo size={44} />
+      <div style={{ marginTop:32, maxWidth:560 }}>
+        <h1 style={{ fontFamily:'Space Grotesk', fontSize:42, fontWeight:700, color:C.fg1, letterSpacing:'-0.03em', lineHeight:1.1, marginBottom:16 }}>
+          Design System
+        </h1>
+        <p style={{ fontSize:16, color:C.fg3, lineHeight:1.65, marginBottom:32 }}>
+          Visual foundations, component library, and interactive UI kit for the Aletheia AI Autonomous Thinking Assistant.
+        </p>
+        <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+          <a href="#ui-kit" style={{ display:'inline-flex', alignItems:'center', gap:7, background:C.blue, color:'#fff', textDecoration:'none', borderRadius:7, padding:'10px 20px', fontSize:14, fontWeight:500, fontFamily:'Inter' }}>
+            <Icon name="play" size={14} color="#fff" />View UI Kit
+          </a>
+          <a href="https://github.com/jayaprakash2207/Aletheia-AI---Autonomous-Thinking-Assistant" target="_blank"
+            style={{ display:'inline-flex', alignItems:'center', gap:7, background:'transparent', color:C.fg2, textDecoration:'none', borderRadius:7, padding:'10px 20px', fontSize:14, fontWeight:500, fontFamily:'Inter', border:`1px solid ${C.border}` }}>
+            <Icon name="github" size={14} color={C.fg2} />GitHub Repo
+          </a>
+        </div>
+      </div>
+      {/* Architecture pipeline */}
+      <div style={{ marginTop:48, display:'flex', alignItems:'center', gap:0, overflowX:'auto', paddingBottom:4 }}>
+        {[
+          { label:'User',       icon:'eye',     color:C.blueLight },
+          { label:'Reasoning',  icon:'brain',   color:C.purple },
+          { label:'Planner',    icon:'layout',  color:C.blue },
+          { label:'Vision',     icon:'eye',     color:C.teal },
+          { label:'Action',     icon:'zap',     color:C.orange },
+          { label:'Validator',  icon:'check',   color:C.green },
+          { label:'Feedback',   icon:'refresh', color:C.amber },
+        ].map((n,i,arr) => (
+          <React.Fragment key={n.label}>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6, minWidth:80 }}>
+              <div style={{ width:44, height:44, borderRadius:11, background:`${n.color}18`, border:`1px solid ${n.color}40`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Icon name={n.icon} size={18} color={n.color} />
+              </div>
+              <span style={{ fontSize:11, color:C.fg4, fontWeight:500, whiteSpace:'nowrap' }}>{n.label}</span>
+            </div>
+            {i < arr.length-1 && <div style={{ color:C.border, fontSize:20, paddingBottom:18, flexShrink:0, margin:'0 -4px' }}>→</div>}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ── Nav ───────────────────────────────────────────────────
+const NAV = [
+  { id:'colors',     label:'Colors',     icon:'palette' },
+  { id:'type',       label:'Typography', icon:'type' },
+  { id:'tokens',     label:'Tokens',     icon:'package' },
+  { id:'components', label:'Components', icon:'layout' },
+  { id:'ui-kit',     label:'UI Kit',     icon:'code' },
+];
+const Nav = ({ active, setActive }) => (
+  <div style={{ position:'sticky', top:0, zIndex:100, background:'rgba(13,17,23,0.92)', backdropFilter:'blur(12px)', borderBottom:`1px solid ${C.border}` }}>
+    <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', gap:0, padding:'0 48px', overflowX:'auto' }}>
+      {NAV.map(n => (
+        <button key={n.id} onClick={() => { setActive(n.id); document.getElementById(n.id)?.scrollIntoView({behavior:'smooth',block:'start'}); }}
+          style={{ display:'flex', alignItems:'center', gap:6, padding:'14px 18px', fontSize:13, fontWeight:500, color: active===n.id ? C.fg1 : C.fg4, background:'transparent', border:'none', borderBottom: active===n.id ? `2px solid ${C.blue}` : '2px solid transparent', cursor:'pointer', fontFamily:'Inter', transition:'color 0.15s', whiteSpace:'nowrap' }}>
+          <Icon name={n.icon} size={13} color={active===n.id ? C.blue : C.fg4} />
+          {n.label}
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
+// ── Section Wrapper ───────────────────────────────────────
+const Section = ({ id, title, subtitle, children }) => (
+  <div id={id} style={{ padding:'56px 48px', borderBottom:`1px solid ${C.border}` }}>
+    <div style={{ maxWidth:1100, margin:'0 auto' }}>
+      <div style={{ marginBottom:32 }}>
+        <h2 style={{ fontFamily:'Space Grotesk', fontSize:28, fontWeight:700, color:C.fg1, letterSpacing:'-0.02em', marginBottom:6 }}>{title}</h2>
+        {subtitle && <p style={{ fontSize:14, color:C.fg3 }}>{subtitle}</p>}
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+// ── Swatch ────────────────────────────────────────────────
+const Swatch = ({ name, hex, token, highlight }) => (
+  <div style={{ borderRadius:8, overflow:'hidden', border: highlight ? `2px solid ${C.blue}` : `1px solid ${C.border}` }}>
+    <div style={{ height:60, background:hex }} />
+    <div style={{ padding:'8px 10px', background:C.bgSurface }}>
+      <div style={{ fontSize:12, color:C.fg2, fontWeight:500, marginBottom:2 }}>{name}</div>
+      <div style={{ fontSize:10, color:C.fg4, fontFamily:'JetBrains Mono' }}>{hex}</div>
+      {token && <div style={{ fontSize:9, color:C.fg4, fontFamily:'JetBrains Mono', marginTop:1, opacity:0.7 }}>{token}</div>}
+    </div>
+  </div>
+);
+
+const ColorGroup = ({ label, swatches }) => (
+  <div style={{ marginBottom:28 }}>
+    <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:12 }}>{label}</div>
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(120px, 1fr))', gap:10 }}>
+      {swatches.map(s => <Swatch key={s.hex} {...s} />)}
+    </div>
+  </div>
+);
+
+const ColorsSection = () => (
+  <Section id="colors" title="Colors" subtitle="Dark-mode first palette derived from app.py — #111827 base, #2563eb accent.">
+    <ColorGroup label="Backgrounds" swatches={[
+      { name:'Base', hex:'#111827', token:'--color-bg-base' },
+      { name:'Surface', hex:'#1f2937', token:'--color-bg-surface' },
+      { name:'Elevated', hex:'#374151', token:'--color-bg-elevated' },
+      { name:'Overlay', hex:'#4b5563', token:'--color-bg-overlay' },
+    ]} />
+    <ColorGroup label="Foregrounds" swatches={[
+      { name:'fg-1', hex:'#f9fafb', token:'--color-fg-1' },
+      { name:'fg-2', hex:'#e5e7eb', token:'--color-fg-2' },
+      { name:'fg-3', hex:'#9ca3af', token:'--color-fg-3' },
+      { name:'fg-4', hex:'#6b7280', token:'--color-fg-4' },
+    ]} />
+    <ColorGroup label="Blue — Primary Accent" swatches={[
+      { name:'blue-100', hex:'#dbeafe', token:'--color-blue-100' },
+      { name:'blue-300', hex:'#93c5fd', token:'--color-blue-300' },
+      { name:'blue-500', hex:'#3b82f6', token:'--color-blue-500' },
+      { name:'blue-600 ★', hex:'#2563eb', token:'--color-primary', highlight:true },
+      { name:'blue-700', hex:'#1d4ed8', token:'--color-blue-700' },
+    ]} />
+    <ColorGroup label="Status & Module Colors" swatches={[
+      { name:'Success', hex:'#10b981', token:'--color-success' },
+      { name:'Warning', hex:'#f59e0b', token:'--color-warning' },
+      { name:'Danger', hex:'#ef4444', token:'--color-danger' },
+      { name:'Reasoning', hex:'#8b5cf6', token:'--color-purple-500' },
+      { name:'Vision', hex:'#06b6d4', token:'--color-teal-500' },
+      { name:'Action', hex:'#f97316', token:'--color-orange-500' },
+    ]} />
+  </Section>
+);
+
+// ── Typography ────────────────────────────────────────────
+const TypeRow = ({ size, weight, family, label, sample, meta }) => (
+  <div style={{ display:'flex', alignItems:'baseline', gap:20, padding:'10px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
+    <div style={{ minWidth:140, flexShrink:0 }}>
+      <div style={{ fontSize:11, color:C.fg4, fontFamily:'JetBrains Mono' }}>{label}</div>
+      <div style={{ fontSize:10, color:C.fg4, opacity:0.6, fontFamily:'JetBrains Mono', marginTop:2 }}>{meta}</div>
+    </div>
+    <div style={{ fontFamily:family, fontSize:size, fontWeight:weight, color:C.fg1, lineHeight:1.2 }}>{sample}</div>
+  </div>
+);
+
+const TypographySection = () => (
+  <Section id="type" title="Typography" subtitle="Space Grotesk (display) · Inter (body) · JetBrains Mono (console/code)">
+    <div style={{ marginBottom:32 }}>
+      {[
+        { label:'--text-4xl', meta:'48px · 700', size:48, weight:700, family:'Space Grotesk', sample:'Aletheia AI' },
+        { label:'--text-3xl', meta:'36px · 700', size:36, weight:700, family:'Space Grotesk', sample:'Autonomous Agent' },
+        { label:'--text-2xl', meta:'28px · 600', size:28, weight:600, family:'Space Grotesk', sample:'Reasoning Engine' },
+        { label:'--text-xl',  meta:'24px · 600', size:24, weight:600, family:'Space Grotesk', sample:'Vision Module' },
+        { label:'--text-app-title', meta:'22px · 700', size:22, weight:700, family:'Space Grotesk', sample:'Aletheia AI' },
+        { label:'--text-lg',  meta:'20px · 500', size:20, weight:500, family:'Inter',         sample:'Orchestrator' },
+        { label:'--text-base',meta:'15px · 400', size:15, weight:400, family:'Inter',         sample:'Enter a goal and run the autonomous agent.' },
+        { label:'--text-sm',  meta:'13px · 400', size:13, weight:400, family:'Inter',         sample:'Status: Running · Max retries: 3 · Backoff: 1.5s' },
+        { label:'--text-xs',  meta:'11px · 500', size:11, weight:500, family:'Inter',         sample:'TASK · CONTEXT · GOAL' },
+      ].map(r => <TypeRow key={r.label} {...r} />)}
+    </div>
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16 }}>
+      {[
+        { title:'Space Grotesk', role:'Display / Headings', sub:'Sub for Segoe UI — geometric, confident', sample:'Think. Plan. Act.' },
+        { title:'Inter', role:'Body / UI', sub:'Clean, readable at small sizes', sample:'Enter a goal and run the autonomous agent.' },
+        { title:'JetBrains Mono', role:'Console / Code', sub:'Sub for Consolas — technical, precise', sample:'INFO | orchestrator | Task started' },
+      ].map(f => (
+        <div key={f.title} style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:16 }}>
+          <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:4 }}>{f.title}</div>
+          <div style={{ fontSize:11, color:C.blue, marginBottom:12 }}>{f.role}</div>
+          <div style={{ fontSize:f.title==='JetBrains Mono'?12:18, fontFamily:f.title, color:C.fg1, lineHeight:1.4, fontWeight:f.title==='Space Grotesk'?700:400 }}>{f.sample}</div>
+          <div style={{ fontSize:10, color:C.fg4, marginTop:8 }}>{f.sub}</div>
+        </div>
+      ))}
+    </div>
+  </Section>
+);
+
+// ── Tokens ────────────────────────────────────────────────
+const TokensSection = () => (
+  <Section id="tokens" title="Tokens" subtitle="Spacing (4px base), border radii, and shadow system.">
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:24 }}>
+      {/* Spacing */}
+      <div>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Spacing</div>
+        {[1,2,3,4,5,6,8,10,12,16].map(n => (
+          <div key={n} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:7 }}>
+            <span style={{ fontSize:10, color:C.fg4, fontFamily:'JetBrains Mono', minWidth:72 }}>--space-{n}</span>
+            <span style={{ fontSize:10, color:C.fg4, fontFamily:'JetBrains Mono', minWidth:30 }}>{n*4}px</span>
+            <div style={{ height:8, borderRadius:4, background:n<=6?C.blue:n<=10?C.blueLight:C.purple, width:n*4 }} />
+          </div>
+        ))}
+      </div>
+      {/* Radii */}
+      <div>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Border Radii</div>
+        {[{t:'sm',v:'4px',r:4,note:'inputs, tags'},{t:'md',v:'6px',r:6,note:'buttons'},{t:'lg',v:'8px',r:8,note:'panels'},{t:'xl',v:'12px',r:12,note:'large surfaces'},{t:'full',v:'9999px',r:9999,note:'pills'}].map(x => (
+          <div key={x.t} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+            <span style={{ fontSize:10, color:C.fg4, fontFamily:'JetBrains Mono', minWidth:54 }}>--r-{x.t}</span>
+            <div style={{ width:44, height:28, background:C.bgElevated, border:`1px solid ${C.border}`, borderRadius:x.r }} />
+            <div>
+              <div style={{ fontSize:10, color:C.fg2 }}>{x.v}</div>
+              <div style={{ fontSize:9, color:C.fg4 }}>{x.note}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Shadows */}
+      <div>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Shadows</div>
+        {[
+          { t:'none', v:'no elevation', shadow:'none', border:`1px solid ${C.border}` },
+          { t:'sm', v:'0 1px 3px rgba(0,0,0,.4)', shadow:'0 1px 3px rgba(0,0,0,0.4)' },
+          { t:'md', v:'0 4px 12px rgba(0,0,0,.5)', shadow:'0 4px 12px rgba(0,0,0,0.5)' },
+          { t:'lg', v:'0 8px 24px rgba(0,0,0,.6)', shadow:'0 8px 24px rgba(0,0,0,0.6)' },
+          { t:'glow', v:'blue focus glow', shadow:'0 0 12px rgba(37,99,235,0.4)', border:`1px solid #2563eb44` },
+        ].map(x => (
+          <div key={x.t} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
+            <div style={{ width:44, height:28, background:C.bgSurface, borderRadius:8, boxShadow:x.shadow, border:x.border||'none', flexShrink:0 }} />
+            <div>
+              <div style={{ fontSize:10, color:C.fg2 }}>shadow-{x.t}</div>
+              <div style={{ fontSize:9, color:C.fg4, fontFamily:'JetBrains Mono' }}>{x.v}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+);
+
+// ── Components ────────────────────────────────────────────
+const Badge = ({ status }) => {
+  const m = { ready:{bg:'rgba(16,185,129,0.12)',color:C.green,label:'● Ready'}, running:{bg:'rgba(37,99,235,0.12)',color:C.blueLight,label:'◌ Running'}, retrying:{bg:'rgba(245,158,11,0.12)',color:C.amber,label:'↺ Retrying'}, failed:{bg:'rgba(239,68,68,0.12)',color:C.red,label:'✕ Failed'} };
+  const s = m[status]||m.ready;
+  return <span style={{ display:'inline-flex', alignItems:'center', fontSize:11, fontWeight:500, padding:'3px 9px', borderRadius:9999, background:s.bg, color:s.color }}>{s.label}</span>;
+};
+
+const ComponentsSection = () => {
+  const [hover, setHover] = useState(null);
+  return (
+  <Section id="components" title="Components" subtitle="Core UI elements for the desktop agent interface.">
+    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+      {/* Buttons */}
+      <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:20 }}>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Buttons</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:10 }}>
+          <button style={{ display:'inline-flex', alignItems:'center', gap:6, background:C.blue, color:'#fff', border:'none', borderRadius:6, padding:'8px 16px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>
+            <Icon name="play" size={13} color="#fff" />Run Agent
+          </button>
+          <button style={{ background:C.red, color:'#fff', border:'none', borderRadius:6, padding:'8px 16px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>Stop</button>
+          <button style={{ background:'transparent', color:C.fg3, border:`1px solid ${C.border}`, borderRadius:6, padding:'8px 14px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>Cancel</button>
+          <button style={{ background:'transparent', color:C.blue, border:`1px solid ${C.blue}`, borderRadius:6, padding:'8px 14px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>Logs</button>
+        </div>
+        <div style={{ display:'flex', gap:8 }}>
+          <button style={{ background:C.blue, color:'#fff', border:'none', borderRadius:5, padding:'5px 12px', fontSize:11, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>Small</button>
+          <button style={{ background:C.blue, color:'#fff', border:'none', borderRadius:7, padding:'10px 22px', fontSize:15, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>Large</button>
+          <button disabled style={{ background:C.bgElevated, color:C.fg4, border:'none', borderRadius:6, padding:'8px 16px', fontSize:13, fontWeight:500, cursor:'not-allowed', fontFamily:'Inter', opacity:0.6 }}>Disabled</button>
+        </div>
+      </div>
+
+      {/* Status badges */}
+      <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:20 }}>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Status Badges</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:12 }}>
+          {['ready','running','retrying','failed'].map(s => <Badge key={s} status={s} />)}
+        </div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+          {[{l:'Reasoning',c:C.purple},{l:'Vision',c:C.teal},{l:'Action',c:C.orange},{l:'Validator',c:C.green}].map(m => (
+            <span key={m.l} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11, fontWeight:500, padding:'3px 9px', borderRadius:9999, background:`${m.c}18`, color:m.c }}>
+              <span style={{ width:6, height:6, borderRadius:'50%', background:m.c }} />{m.l}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Inputs */}
+      <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:20 }}>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Form Inputs</div>
+        <div style={{ marginBottom:10 }}>
+          <div style={{ fontSize:11, fontWeight:500, color:C.fg3, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5 }}>Goal</div>
+          <input defaultValue="Open browser and search for weather" style={{ width:'100%', background:'#0d1117', border:`1px solid ${C.border}`, borderRadius:4, color:C.fg1, fontFamily:'Inter', fontSize:13, padding:'8px 10px', outline:'none' }} />
+        </div>
+        <div style={{ marginBottom:10 }}>
+          <div style={{ fontSize:11, fontWeight:500, color:C.fg3, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5 }}>Validated</div>
+          <input defaultValue="gemini-2.0-flash" style={{ width:'100%', background:'#0d1117', border:`1px solid ${C.green}`, boxShadow:`0 0 0 2px rgba(16,185,129,0.15)`, borderRadius:4, color:C.fg1, fontFamily:'Inter', fontSize:13, padding:'8px 10px', outline:'none' }} />
+        </div>
+        <div>
+          <div style={{ fontSize:11, fontWeight:500, color:C.fg3, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5 }}>Error</div>
+          <input defaultValue="invalid-model-id" style={{ width:'100%', background:'#0d1117', border:`1px solid ${C.red}`, boxShadow:`0 0 0 2px rgba(239,68,68,0.15)`, borderRadius:4, color:C.fg1, fontFamily:'Inter', fontSize:13, padding:'8px 10px', outline:'none' }} />
+          <div style={{ fontSize:11, color:C.red, marginTop:4 }}>Model not found</div>
+        </div>
+      </div>
+
+      {/* Panel */}
+      <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:20 }}>
+        <div style={{ fontSize:11, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:14 }}>Module Panel</div>
+        {[
+          { name:'Reasoning', icon:'brain', color:C.purple, s:'active' },
+          { name:'Planner',   icon:'cpu',   color:C.blue,   s:'running' },
+          { name:'Vision',    icon:'eye',   color:C.teal,   s:'active' },
+          { name:'Action',    icon:'zap',   color:C.orange, s:'idle' },
+          { name:'Validator', icon:'check', color:C.green,  s:'waiting' },
+        ].map(m => (
+          <div key={m.name} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
+            <div style={{ width:26, height:26, borderRadius:6, background:`${m.color}18`, border:`1px solid ${m.color}33`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Icon name={m.icon} size={12} color={m.color} />
+            </div>
+            <div style={{ flex:1, fontSize:12, color:C.fg2, fontWeight:500 }}>{m.name}</div>
+            <div style={{ fontSize:10, color: m.s==='active'?C.green : m.s==='running'?C.blueLight : C.fg4 }}>{m.s}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Log panel */}
+    <div style={{ marginTop:20, background:'#0d1117', border:`1px solid ${C.border}`, borderRadius:8, overflow:'hidden' }}>
+      <div style={{ padding:'10px 14px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div style={{ fontSize:10, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', display:'flex', alignItems:'center', gap:7 }}>
+          <Icon name="terminal" size={12} color={C.fg4} />Live Output
+        </div>
+        <span style={{ fontSize:10, padding:'2px 8px', borderRadius:9999, background:'rgba(37,99,235,0.12)', color:C.blueLight, display:'flex', alignItems:'center', gap:4 }}>
+          <span style={{ width:5, height:5, borderRadius:'50%', background:C.blueLight, display:'inline-block', animation:'pulse 1.2s infinite' }}></span>Live
+        </span>
+      </div>
+      <div style={{ padding:'12px 14px' }}>
+        {[
+          { ts:'14:23:01', level:'OK',   lc:C.green,     mod:'orchestrator ', msg:'Task started: ', em:'Open browser and search for weather' },
+          { ts:'14:23:01', level:'INFO', lc:C.blueLight, mod:'reasoning     ', msg:'Generating plan via ', em:'gemini-2.0-flash' },
+          { ts:'14:23:03', level:'INFO', lc:C.blueLight, mod:'vision        ', msg:'Screenshot captured ', em:'1920×1080' },
+          { ts:'14:23:05', level:'WARN', lc:C.amber,     mod:'validation    ', msg:'Expected element not found — retrying ', em:'(1/3)' },
+          { ts:'14:23:07', level:'OK',   lc:C.green,     mod:'validation    ', msg:'Step validated ✓', em:'' },
+        ].map((l,i) => (
+          <div key={i} style={{ display:'flex', fontFamily:'JetBrains Mono', fontSize:11, lineHeight:1.65 }}>
+            <span style={{ color:C.fg4, minWidth:72, flexShrink:0 }}>{l.ts}</span>
+            <span style={{ color:l.lc, minWidth:44, flexShrink:0 }}>{l.level}</span>
+            <span style={{ color:C.purple, minWidth:106, flexShrink:0 }}>{l.mod}</span>
+            <span style={{ color:C.fg3 }}>{l.msg}<span style={{ color:C.fg2 }}>{l.em}</span></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Section>
+  );
+};
+
+// ── UI Kit ────────────────────────────────────────────────
+const DEMO_LOGS = [
+  { ts:'14:23:01', level:'OK',   lc:'#10b981', mod:'orchestrator ', msg:'Task started: ', em:'Open browser and search for weather in Bangalore' },
+  { ts:'14:23:01', level:'INFO', lc:'#3b82f6', mod:'reasoning     ', msg:'Generating plan via ', em:'gemini-2.0-flash…' },
+  { ts:'14:23:02', level:'INFO', lc:'#3b82f6', mod:'planning      ', msg:'Plan ready — ', em:'4 steps' },
+  { ts:'14:23:03', level:'INFO', lc:'#3b82f6', mod:'vision        ', msg:'Screenshot captured ', em:'1920×1080' },
+  { ts:'14:23:04', level:'INFO', lc:'#3b82f6', mod:'action        ', msg:'click(x=640, y=400) — browser opened', em:'' },
+  { ts:'14:23:05', level:'WARN', lc:'#f59e0b', mod:'validation    ', msg:'Expected element not found — retrying ', em:'(1/3)' },
+  { ts:'14:23:07', level:'OK',   lc:'#10b981', mod:'validation    ', msg:'Step 2 validated ✓', em:'' },
+  { ts:'14:23:08', level:'INFO', lc:'#3b82f6', mod:'action        ', msg:'type("weather bangalore") — query entered', em:'' },
+  { ts:'14:23:09', level:'OK',   lc:'#10b981', mod:'orchestrator ', msg:'Task complete — ', em:'success' },
+];
+const HISTORY = [
+  { task:'Open browser and search for weather in Bangalore', status:'ready' },
+  { task:'Book calendar slot for tomorrow at 2PM', status:'failed' },
+  { task:'Download and open latest GitHub PR diff', status:'ready' },
+];
+
+const UIKitSection = () => {
+  const [task, setTask] = useState('Open browser and search for weather in Bangalore');
+  const [context, setContext] = useState('');
+  const [status, setStatus] = useState('ready');
+  const [logs, setLogs] = useState(DEMO_LOGS);
+  const [activeHist, setActiveHist] = useState(0);
+  const logRef = useRef(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [logs]);
+
+  const handleRun = () => {
+    if (!task.trim() || status === 'running') return;
+    setStatus('running');
+    const start = [
+      { ts:'now', level:'OK',   lc:C.green,     mod:'orchestrator ', msg:'Task started: ', em:task },
+      { ts:'now', level:'INFO', lc:C.blueLight, mod:'reasoning     ', msg:'Generating plan via ', em:'gemini-2.0-flash…' },
+    ];
+    setLogs(start);
+    const extra = [
+      { ts:'now', level:'INFO', lc:C.blueLight, mod:'planning      ', msg:'Decomposing into steps…', em:'' },
+      { ts:'now', level:'INFO', lc:C.blueLight, mod:'vision        ', msg:'Capturing desktop screenshot…', em:'' },
+      { ts:'now', level:'INFO', lc:C.blueLight, mod:'action        ', msg:'Opening browser via ', em:'selenium' },
+      { ts:'now', level:'OK',   lc:C.green,     mod:'validation    ', msg:'Browser open ✓', em:'' },
+      { ts:'now', level:'OK',   lc:C.green,     mod:'orchestrator ', msg:'Task complete — ', em:'success' },
+    ];
+    let i = 0;
+    timerRef.current = setInterval(() => {
+      if (i < extra.length) { setLogs(p => [...p, extra[i]]); i++; }
+      else { clearInterval(timerRef.current); setStatus('ready'); }
+    }, 850);
+  };
+  const handleStop = () => { clearInterval(timerRef.current); setStatus('failed'); setLogs(p => [...p, { ts:'now', level:'ERROR', lc:C.red, mod:'orchestrator ', msg:'Stopped by user', em:'' }]); };
+
+  return (
+  <Section id="ui-kit" title="UI Kit" subtitle="Interactive replica of the Aletheia AI desktop app. Click Run Agent to watch the agent execute.">
+    <div style={{ background:C.bgBase, borderRadius:10, overflow:'hidden', border:`1px solid ${C.border}`, boxShadow:'0 8px 40px rgba(0,0,0,0.7)' }}>
+      {/* Titlebar */}
+      <div style={{ height:36, background:'#0d1117', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', padding:'0 14px', gap:6 }}>
+        <div style={{ width:10, height:10, borderRadius:'50%', background:C.red, marginRight:2 }} />
+        <div style={{ width:10, height:10, borderRadius:'50%', background:C.amber, marginRight:2 }} />
+        <div style={{ width:10, height:10, borderRadius:'50%', background:C.green }} />
+        <div style={{ flex:1, textAlign:'center', fontSize:11, color:C.fg4, fontFamily:'JetBrains Mono' }}>Aletheia AI — Autonomous Thinking Assistant</div>
+      </div>
+      {/* Body */}
+      <div style={{ display:'flex', height:540 }}>
+        {/* Sidebar */}
+        <div style={{ width:200, background:C.bgSurface, borderRight:`1px solid ${C.border}`, display:'flex', flexDirection:'column', flexShrink:0 }}>
+          <div style={{ padding:'14px 12px 12px', borderBottom:`1px solid ${C.border}` }}>
+            <Logo size={24} />
+          </div>
+          <div style={{ padding:'10px 8px' }}>
+            <div style={{ fontSize:10, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8 }}>History</div>
+            {HISTORY.map((h, i) => (
+              <div key={i} onClick={() => setActiveHist(i)}
+                style={{ padding:'7px 8px', borderRadius:6, marginBottom:3, cursor:'pointer', background:i===activeHist?C.bgElevated:'transparent', border:i===activeHist?`1px solid ${C.border}`:'1px solid transparent' }}>
+                <div style={{ fontSize:12, color:i===activeHist?C.fg1:C.fg2, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:168, marginBottom:3 }}>{h.task}</div>
+                <Badge status={h.status} />
+              </div>
+            ))}
+          </div>
+          <div style={{ flex:1 }} />
+          <div style={{ padding:'10px 12px', borderTop:`1px solid ${C.border}`, display:'flex', alignItems:'center', gap:7 }}>
+            <Icon name="settings" size={13} color={C.fg4} /><span style={{ fontSize:12, color:C.fg4 }}>Settings</span>
+          </div>
+        </div>
+        {/* Main */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', padding:16, gap:0, overflow:'hidden' }}>
+          <div style={{ display:'flex', gap:14, marginBottom:14, flexShrink:0 }}>
+            {/* Task panel */}
+            <div style={{ flex:1, background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:14 }}>
+              <div style={{ fontSize:10, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:12, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <span>Task</span><Badge status={status} />
+              </div>
+              <div style={{ marginBottom:9 }}>
+                <div style={{ fontSize:11, fontWeight:500, color:C.fg3, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5 }}>Goal</div>
+                <input value={task} onChange={e => setTask(e.target.value)} disabled={status==='running'}
+                  style={{ width:'100%', background:'#0d1117', border:`1px solid ${C.border}`, borderRadius:4, color:C.fg1, fontFamily:'Inter', fontSize:13, padding:'7px 10px', outline:'none' }} />
+              </div>
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontSize:11, fontWeight:500, color:C.fg3, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5 }}>Context</div>
+                <input value={context} onChange={e => setContext(e.target.value)} disabled={status==='running'}
+                  placeholder="Optional…" style={{ width:'100%', background:'#0d1117', border:`1px solid ${C.border}`, borderRadius:4, color:C.fg1, fontFamily:'Inter', fontSize:13, padding:'7px 10px', outline:'none' }} />
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                {status !== 'running' ? (
+                  <button onClick={handleRun} style={{ display:'flex', alignItems:'center', gap:6, background:C.blue, color:'#fff', border:'none', borderRadius:6, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>
+                    <Icon name="play" size={13} color="#fff" />Run Agent
+                  </button>
+                ) : (
+                  <button onClick={handleStop} style={{ display:'flex', alignItems:'center', gap:6, background:C.red, color:'#fff', border:'none', borderRadius:6, padding:'7px 16px', fontSize:13, fontWeight:500, cursor:'pointer', fontFamily:'Inter' }}>
+                    <Icon name="stop" size={13} color="#fff" />Stop
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* Modules */}
+            <div style={{ width:180, background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, padding:14, flexShrink:0 }}>
+              <div style={{ fontSize:10, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:10 }}>Modules</div>
+              {[{n:'Reasoning',ic:'brain',cl:C.purple},{n:'Planner',ic:'cpu',cl:C.blue},{n:'Vision',ic:'eye',cl:C.teal},{n:'Action',ic:'zap',cl:C.orange},{n:'Validator',ic:'check',cl:C.green},{n:'Feedback',ic:'refresh',cl:C.amber}].map(m => {
+                const st = status==='running' ? (m.n==='Validator'||m.n==='Feedback'?'idle':'active') : 'idle';
+                return (
+                  <div key={m.n} style={{ display:'flex', alignItems:'center', gap:7, padding:'6px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
+                    <div style={{ width:24, height:24, borderRadius:5, background:`${m.cl}18`, border:`1px solid ${m.cl}33`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <Icon name={m.ic} size={11} color={m.cl} />
+                    </div>
+                    <div style={{ flex:1, fontSize:11, color:C.fg2, fontWeight:500 }}>{m.n}</div>
+                    <div style={{ fontSize:9, color:st==='active'?C.green:C.fg4 }}>{st}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Log */}
+          <div style={{ flex:1, display:'flex', flexDirection:'column', background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:8, overflow:'hidden', minHeight:0 }}>
+            <div style={{ padding:'9px 14px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
+              <div style={{ fontSize:10, fontWeight:600, color:C.fg4, letterSpacing:'0.1em', textTransform:'uppercase', display:'flex', alignItems:'center', gap:7 }}>
+                <Icon name="terminal" size={12} color={C.fg4} />Live Output
+              </div>
+              {status==='running' && <span style={{ fontSize:10, padding:'2px 8px', borderRadius:9999, background:'rgba(37,99,235,0.12)', color:C.blueLight, display:'flex', alignItems:'center', gap:4 }}>
+                <span style={{ width:5, height:5, borderRadius:'50%', background:C.blueLight, display:'inline-block', animation:'pulse 1.2s infinite' }}></span>Live
+              </span>}
+            </div>
+            <div ref={logRef} style={{ flex:1, overflowY:'auto', padding:'10px 14px', background:'#0d1117' }}>
+              {logs.map((l,i) => (
+                <div key={i} style={{ display:'flex', fontFamily:'JetBrains Mono', fontSize:11, lineHeight:1.65 }}>
+                  <span style={{ color:C.fg4, minWidth:38, flexShrink:0 }}>{l.ts}</span>
+                  <span style={{ color:l.lc, minWidth:44, flexShrink:0 }}>{l.level}</span>
+                  <span style={{ color:C.purple, minWidth:102, flexShrink:0 }}>{l.mod}</span>
+                  <span style={{ color:C.fg3 }}>{l.msg}<span style={{ color:C.fg2 }}>{l.em}</span></span>
+                </div>
+              ))}
+              {status==='running' && <div style={{ fontFamily:'JetBrains Mono', fontSize:11, color:C.fg4, marginTop:2 }}><span style={{ display:'inline-block', width:7, height:12, background:C.fg4, animation:'blink 1s infinite', verticalAlign:'text-bottom' }}></span></div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+  );
+};
+
+// ── Footer ────────────────────────────────────────────────
+const Footer = () => (
+  <div style={{ padding:'40px 48px', background:'#0d1117' }}>
+    <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:16 }}>
+      <Logo size={28} />
+      <div style={{ display:'flex', gap:24 }}>
+        <a href="https://github.com/jayaprakash2207/Aletheia-AI---Autonomous-Thinking-Assistant" target="_blank" style={{ fontSize:13, color:C.fg4, textDecoration:'none', display:'flex', alignItems:'center', gap:6 }}>
+          <Icon name="github" size={14} color={C.fg4} />GitHub
+        </a>
+        <span style={{ fontSize:13, color:C.fg4 }}>MIT License</span>
+        <span style={{ fontSize:13, color:C.fg4 }}>Python 3.9+</span>
+      </div>
+    </div>
+  </div>
+);
+
+// ── App ───────────────────────────────────────────────────
+function App() {
+  const [activeNav, setActiveNav] = useState('colors');
+  useEffect(() => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) setActiveNav(e.target.id); });
+    }, { threshold: 0.3 });
+    ['colors','type','tokens','components','ui-kit'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div>
+      <Hero />
+      <Nav active={activeNav} setActive={setActiveNav} />
+      <ColorsSection />
+      <TypographySection />
+      <TokensSection />
+      <ComponentsSection />
+      <UIKitSection />
+      <Footer />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body></html>
